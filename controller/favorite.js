@@ -3,15 +3,28 @@ import { product } from "../model/product.js"
 
 
 
-// ➕ Add to Favorite
 export const addToFavorite = async (req, res) => {
   try {
     const userId = req.user.id
     const { productId } = req.body
 
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" })
+    }
+
     const products = await product.findById(productId)
     if (!products) {
-      return res.status(404).json({ message: "Image not found" })
+      return res.status(404).json({ message: "Product not found" })
+    }
+
+   
+    const existing = await favorite.findOne({
+      user: userId,
+      product: productId
+    })
+
+    if (existing) {
+      return res.status(400).json({ message: "Already in favorites" })
     }
 
     const favorites = await favorite.create({
@@ -19,19 +32,12 @@ export const addToFavorite = async (req, res) => {
       product: productId
     })
 
-    res.status(201).json({ message: "Added to favorites", favorite })
+    res.status(201).json({ message: "Added to favorites", favorites })
 
   } catch (error) {
-
-    // duplicate error
-    if (error.code === 11000) {
-      return res.status(400).json({ message: "Already in favorites" })
-    }
-
     res.status(500).json({ message: error.message })
   }
 }
-
 
 
 
@@ -61,7 +67,7 @@ export const removeFromFavorite = async (req, res) => {
             if(!products) return res.status(400).json({message: 'Image not exist'}) 
             res.status(201).json({ success:true,
          message: 'product deleted successful'})
-            await products.deleteOne ()
+           
               
         } catch (error) {
             res.status(500).json({ success:false,message:"Sever Error", error})

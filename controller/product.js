@@ -51,7 +51,7 @@ export const getAllProducts = async (req, res) => {
 
     const filter = section ? { section } : {};
 
-    let sortOption = { createdAt: -1 }; // default = Normal
+    let sortOption = { createdAt: -1 }; 
 
     if (sort === "low") sortOption = { price: 1 };
     if (sort === "high") sortOption = { price: -1 };
