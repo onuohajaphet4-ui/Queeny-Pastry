@@ -28,9 +28,7 @@ export const createNotification = async (req, res) => {
 
 export const getAllNotification = async (req, res) => {
   try {
-    const notifications = await notisfication.find({
-      user: req.user.id,
-    }).sort({ createdAt: -1 });
+    const notifications = await notisfication.find().sort({ createdAt: -1 });
 
     res.status(200).json(notifications);
 

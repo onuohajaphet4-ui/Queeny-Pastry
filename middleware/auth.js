@@ -4,21 +4,21 @@ const protectMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ message: "No token provided" });
-  }
+  req.user = null; // allow guest
+  return next();
+}
 
   const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-
     // decoded must contain { id, role }
     req.user = decoded;
-
-    next();
+    console.log(req.user)
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    req.user = null;
   }
+  next();
 };
 
 export default protectMiddleware;

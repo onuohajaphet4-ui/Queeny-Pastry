@@ -4,10 +4,10 @@ import auth from "../middleware/auth.js"
 
 const router = express.Router ()
 
-router.post ('/', auth,   addCart)
-router.get ('/', auth, getAllCart)
-router.get ('/:id', auth, getCartById)
-router.put ('/:id', auth, updateCart)
-router.delete ('/delete/:id', auth, deleteCart)
+router.post ('/',    addCart)
+router.get ('/',  getAllCart)
+router.get ('/:id',  getCartById)
+router.put ('/:id',  updateCart)
+router.delete ('/delete/:id',  deleteCart)
 
 export default router

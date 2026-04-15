@@ -9,7 +9,7 @@ passport.use(
         {
             clientID:process.env.CLIENT_ID, 
             clientSecret:process.env.CLIENT_SECRET,
-            callbackURL:"https://queeny-pastry.vercel.app/auth/google/callback"
+            callbackURL:"https://queeny-pastry.onrender.com/auth/google/callback"
             
         },
 

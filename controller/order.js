@@ -2,16 +2,18 @@ import Order from "../model/order.js";
 import {cart} from "../model/cart.js";
 import axios from "axios";
 import {product} from '../model/product.js'
+import mongoose from "mongoose";
+
 
 export const createOrder = async (req, res) => {
-  try {
-   const { reference } = req.body;
-   const userId = req.user.id
+try {
+const { reference } = req.body;
 
 if (!reference) {
-  return res.status(400).json({ message: "Reference required" });
+  return res.status(400).json({ message: "Reference is required" });
 }
 
+//  VERIFY PAYMENT WITH PAYSTACK
 const verify = await axios.get(
   `https://api.paystack.co/transaction/verify/${reference}`,
   {
@@ -27,53 +29,59 @@ if (paymentData.status !== "success") {
   return res.status(400).json({ message: "Payment not verified" });
 }
 
-    const metadata = paymentData.metadata;
-    
-    
- 
-    const cartItems = await cart.find({ userId:req.user.id }).populate("productId");
-    
-    if (!cartItems.length) {
-      return res.status(400).json({ message: "Cart empty after payment" });
-    }
+//  GET METADATA
+const metadata = paymentData.metadata;
 
-    const items = cartItems.map(item => ({
-      productId: item.productId._id,
-      quantity: item.quantity,
-      price: item.productId.price
-    }));
+const cartItems = JSON.parse(metadata.cartItems || "[]");
+const delivery = JSON.parse(metadata.delivery || "{}");
 
-    const delivery = JSON.parse(metadata.delivery || "{}");
+if (!cartItems.length) {
+  return res.status(400).json({ message: "Cart is empty" });
+}
 
-    const order = await Order.create({
-      userId,
-      email: paymentData.customer.email,
-      items,
-      delivery,
-      totalAmount: paymentData.amount / 100,
-      paymentReference: reference
-    });
+//  FORMAT ITEMS
+const items = cartItems.map(item => ({
+  productId: item._id,
+  quantity: item.quantity,
+  price: item.price
+}));
 
-    
-    
-    for (const item of order.items) {
+//  OPTIONAL USER (guest support)
+const userId = req.user ? req.user.id : null;
+
+//  CREATE ORDER
+const order = await Order.create({
+  userId,
+  email: paymentData.customer.email,
+  items,
+  delivery,
+  totalAmount: paymentData.amount / 100,
+  paymentReference: reference,
+  status: "processing"
+});
+
+//  UPDATE PRODUCT SALES
+for (const item of items) {
   await product.findByIdAndUpdate(
     item.productId,
     { $inc: { totalSold: item.quantity } }
   );
-
-  await cart.deleteMany({ userId: req.user.id });
 }
 
-    res.json({ success: true, order });
-    
+res.status(201).json({
+  success: true,
+  message: "Order created successfully",
+  order
+});
 
-  }catch (error) {
-  console.log("🔥 FULL ERROR:", error);
-  console.log("🔥 MESSAGE:", error.message);
-  console.log("🔥 RESPONSE:", error.response?.data);
-  
-  res.status(500).json({ message: "Order creation failed" });
+} catch (error) {
+console.log("🔥 ERROR:", error.response?.data || error.message);
+
+res.status(500).json({
+  success: false,
+  message: "Order creation failed"
+});
+
 }
 };
 
@@ -109,14 +117,52 @@ export const deleteOrder  = async (req, res) => {
 }
 
 export const getUserOrders = async (req, res) => {
+  console.log("getUserOrders HIT");
   try {
-    const orders = await Order.find({ userId: req.user.id,  }).populate("items.productId").sort({createdAt: -1})
 
-   res.status(200).json({
+    const userId = req.user?.id;
+    const email = req.user?.email;
+
+    console.log("USER ID:", userId);
+    console.log("EMAIL:", email);
+
+    const orders = await Order.find({
+      $or: [
+        userId ? { userId: new mongoose.Types.ObjectId(userId) } : null,
+        email ? { email: email } : null
+      ].filter(Boolean)
+    })
+      .populate("items.productId")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
       success: true,
       count: orders.length,
       orders,
     });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getOrderByReference = async (req, res) => {
+  try {
+    
+    const { reference } = req.params;
+
+    const order = await Order.findOne({
+      paymentReference: reference
+    }).populate("items.productId");
+    console.log(reference)
+    
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ success: true, order });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

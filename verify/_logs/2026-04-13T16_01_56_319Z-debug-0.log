@@ -5,13 +5,13 @@
 4 silly config load:file:c:\Users\HomePC\Desktop\pasty backend\.npmrc
 5 silly config load:file:C:\Users\HomePC\.npmrc
 6 silly config load:file:C:\Users\HomePC\AppData\Roaming\npm\etc\npmrc
-7 verbose title npm view mongoose description dist-tags.latest homepage version time
-8 verbose argv "view" "--json" "--" "mongoose" "description" "dist-tags.latest" "homepage" "version" "time"
-9 verbose logfile logs-max:10 dir:c:\Users\HomePC\Desktop\pasty backend\verify\_logs\2026-04-08T17_16_24_156Z-
-10 verbose logfile c:\Users\HomePC\Desktop\pasty backend\verify\_logs\2026-04-08T17_16_24_156Z-debug-0.log
-11 silly logfile start cleaning logs, removing 1 files
+7 verbose title npm view passport description dist-tags.latest homepage version time
+8 verbose argv "view" "--json" "--" "passport" "description" "dist-tags.latest" "homepage" "version" "time"
+9 verbose logfile logs-max:10 dir:c:\Users\HomePC\Desktop\pasty backend\verify\_logs\2026-04-13T16_01_56_319Z-
+10 verbose logfile c:\Users\HomePC\Desktop\pasty backend\verify\_logs\2026-04-13T16_01_56_319Z-debug-0.log
+11 silly logfile start cleaning logs, removing 6 files
 12 silly logfile done cleaning log files
-13 http fetch GET 200 https://registry.npmjs.org/mongoose 168ms (cache stale)
+13 http fetch GET 200 https://registry.npmjs.org/passport 704ms (cache stale)
 14 verbose cwd c:\Users\HomePC\Desktop\pasty backend
 15 verbose os Windows_NT 10.0.19045
 16 verbose node v22.19.0

@@ -10,7 +10,7 @@ router.get ("/auth/google/callback" , passport.authenticate("google", {session:f
     const token =jwt.sign(
         {id:req.user._id, role:req.user.role.role},
         process.env.SECRET_KEY,
-        {expiresIn:"1h"}
+        {expiresIn:"7d"}
     )
 
 

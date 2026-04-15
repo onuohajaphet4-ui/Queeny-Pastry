@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import {user} from "../model/user.js"
 import crypto from "crypto"
+import Order from "../model/order.js";
 
 //Register
 export const creatUser  = async (req, res) => {
@@ -56,6 +57,8 @@ export const creatUser  = async (req, res) => {
               //check if password is correct
               const isMatch = await  bcrypt.compare(password, users.password)
               if (!isMatch) return res.status(400).json({message:'incorrect password'})
+
+                
                 
                   const token = jwt.sign(
                       {id:users._id,
