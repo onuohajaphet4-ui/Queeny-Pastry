@@ -199,7 +199,7 @@ export const getAllUser = async (req, res) => {
 
 
        //create rest link
-       const resetUrl= `http://localhost:5134/reset-password/${token}`
+       const resetUrl= `https://queeny-pastry.vercel.app/reset-password/${token}`
 
     //    console.log("RESET PASSWORD LINK:", resetUrl)
 
